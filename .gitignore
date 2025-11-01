@@ -1,0 +1,13 @@
+# Virtual Environment
+venv/
+.venv/
+
+# Python compiled files
+__pycache__/
+*.pyc
+
+# Database/Chrome files
+chrome_db/
+
+# Environment variable file (Crucial for secrets management)
+.env

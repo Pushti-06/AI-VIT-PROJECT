@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VIT AI Command Core</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* --- Core Styles & Background --- */
+        body {
+            font-family: 'Roboto Mono', monospace;
+            background-color: #020418;
+            background-image: 
+                radial-gradient(white, rgba(255,255,255,0) 2px, transparent 40px),
+                radial-gradient(white, rgba(255,255,255,0) 1px, transparent 30px),
+                radial-gradient(white, rgba(255,255,255,0) 2px, transparent 40px),
+                radial-gradient(rgba(255,255,255,.4), rgba(255,255,255,0) 2px, transparent 30px);
+            background-size: 550px 550px, 350px 350px, 250px 250px, 150px 150px; 
+            background-position: 0 0, 40px 60px, 130px 270px, 70px 100px;
+            animation: stars-move 300s linear infinite;
+        }
+
+        @keyframes stars-move {
+            from { background-position: 0 0, 40px 60px, 130px 270px, 70px 100px; }
+            to { background-position: -10000px 5000px, -10040px 5060px, -10130px 5270px, -10070px 5100px; }
+        }
+        
+        /* --- 3D Perspective Container --- */
+        .perspective-container {
+            perspective: 1500px;
+        }
+
+        .main-panel {
+            font-family: 'Orbitron', sans-serif;
+            background: rgba(10, 25, 47, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(0, 191, 255, 0.4);
+            box-shadow: 0 0 30px rgba(0, 191, 255, 0.2);
+            transform: rotateX(5deg) rotateY(-3deg);
+            transition: transform 0.5s ease;
+        }
+        .main-panel:hover {
+            transform: rotateX(0deg) rotateY(0deg);
+        }
+
+        /* --- Custom UI Elements --- */
+        .header-text {
+            text-shadow: 0 0 8px rgba(0, 191, 255, 0.7);
+        }
+
+        .custom-input {
+            background-color: rgba(0, 10, 20, 0.7);
+            border: 1px solid rgba(0, 191, 255, 0.3);
+            transition: all 0.3s ease;
+            font-family: 'Roboto Mono', monospace;
+        }
+        .custom-input:focus {
+            border-color: rgba(0, 191, 255, 0.8);
+            box-shadow: 0 0 15px rgba(0, 191, 255, 0.5);
+        }
+
+        .custom-button {
+            background: transparent;
+            border: 2px solid;
+            transition: all 0.3s ease-out;
+            position: relative;
+            overflow: hidden;
+        }
+        .custom-button::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.4s, height 0.4s;
+        }
+        .custom-button:hover::before {
+            width: 250%;
+            height: 250%;
+        }
+        .custom-button:hover {
+            box-shadow: 0 0 20px rgba(255,255,255,0.4);
+        }
+        .btn-green { border-color: #00ff9b; color: #00ff9b; }
+        .btn-green:hover { background-color: #00ff9b; color: #020418; box-shadow: 0 0 20px #00ff9b; }
+        
+        .btn-indigo { border-color: #8257e5; color: #8257e5; }
+        .btn-indigo:hover { background-color: #8257e5; color: #020418; box-shadow: 0 0 20px #8257e5; }
+
+        /* --- Response Area Animations --- */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+
+        /* --- Interactive Robot Placeholder --- */
+        #robot-assistant {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 100px;
+            height: 100px;
+            transition: transform 0.3s ease;
+            z-index: 100;
+        }
+        #robot-assistant:hover {
+            transform: scale(1.1);
+        }
+        #robot-assistant-bubble {
+            position: absolute;
+            bottom: 110px; /* Position above the robot */
+            right: 0;
+            background-color: rgba(0, 191, 255, 0.9);
+            color: #020418;
+            padding: 10px;
+            border-radius: 10px;
+            font-size: 12px;
+            font-family: 'Roboto Mono', monospace;
+            width: 180px;
+            text-align: center;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: opacity 0.3s, transform 0.3s;
+            pointer-events: none; /* Allows clicks to pass through */
+        }
+        #robot-assistant:hover #robot-assistant-bubble {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-gray-100 font-sans">
+
+    <div id="robot-assistant">
+        <div id="robot-assistant-bubble">Hello! I'm here to help you navigate the Command Core.</div>
+        <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="50" cy="50" r="45" fill="rgba(10, 25, 47, 0.8)" stroke="#00bfff" stroke-width="2"/>
+            <circle cx="38" cy="45" r="8" fill="#00bfff"/>
+            <circle cx="62" cy="45" r="8" fill="#00bfff"/>
+            <path d="M35 65 C 40 75, 60 75, 65 65" stroke="#00bfff" stroke-width="2"/>
+            <path d="M49 50 L 49 55" stroke="#00bfff" stroke-width="2" />
+            <path d="M51 50 L 51 55" stroke="#00bfff" stroke-width="2" />
+        </svg>
+    </div>
+
+    <div class="container mx-auto p-4 md:p-8 perspective-container">
+        <div class="main-panel p-8 rounded-2xl w-full max-w-3xl mx-auto">
+            
+            <h1 class="text-3xl font-bold text-center mb-8 text-cyan-300 header-text tracking-widest">
+                V.I.T. A.I. COMMAND CORE
+            </h1>
+            
+            <div class="mb-8 border-b border-cyan-500/30 pb-8">
+                <p class="text-center text-cyan-400 mb-6 text-sm uppercase tracking-wider">[ Module 1: Knowledge Ingestion ]</p>
+                <form id="uploadForm" class="space-y-6">
+                    <div>
+                        <label for="file-upload" class="block text-sm font-medium text-gray-300 mb-2">Select Datastream (PDF/DOCX):</label>
+                        <input id="file-upload" name="file" type="file" accept=".pdf,.docx" class="block w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-cyan-500/20 file:text-cyan-300 hover:file:bg-cyan-500/40 transition-colors cursor-pointer" required>
+                    </div>
+                    <button type="submit" class="w-full font-bold py-3 px-4 rounded-lg custom-button btn-green">
+                        UPLOAD & INTEGRATE
+                    </button>
+                </form>
+                <div id="uploadResponseArea" class="mt-6"></div>
+            </div>
+
+            <div>
+                <p class="text-center text-cyan-400 mb-6 text-sm uppercase tracking-wider">[ Module 2: Execute Query ]</p>
+                <form id="questionForm" class="space-y-6">
+                    <div>
+                        <label for="text-question" class="block text-sm font-medium text-gray-300 mb-2">Query Input:</label>
+                        <input id="text-question" type="text" placeholder="e.g., What is CPU scheduling?" class="w-full rounded-lg p-3 text-sm focus:outline-none custom-input text-cyan-300 placeholder:text-cyan-700">
+                    </div>
+                     <div>
+                        <label for="image-upload" class="block text-sm font-medium text-gray-300 mb-2">Or Upload Query File:</label>
+                        <input id="image-upload" name="image" type="file" accept=".pdf,.docx,image/png,image/jpeg" class="block w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-indigo-500/20 file:text-indigo-300 hover:file:bg-indigo-500/40 transition-colors cursor-pointer">
+                    </div>
+                    <button type="submit" class="w-full font-bold py-3 px-4 rounded-lg custom-button btn-indigo">
+                        PROCESS QUERY
+                    </button>
+                </form>
+                <div id="answerResponseArea" class="mt-6"></div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // --- Handlers for the first form (File Upload) ---
+        const uploadForm = document.getElementById('uploadForm');
+        const uploadResponseArea = document.getElementById('uploadResponseArea');
+        const fileInput = document.getElementById('file-upload');
+
+        uploadForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const file = fileInput.files[0];
+            if (!file) {
+                displayUploadResponse({ message: "Please select a file first.", isError: true });
+                return;
+            }
+            const formData = new FormData();
+            formData.append('uploaded_file', file);
+            displayUploadResponse({ message: "Uploading and learning...", isError: false });
+
+            try {
+                const response = await fetch('/upload-file/', { method: 'POST', body: formData });
+                const result = await response.json();
+                if (!response.ok) {
+                    displayUploadResponse({ message: `Error: ${result.detail || 'Something went wrong.'}`, isError: true });
+                } else {
+                    displayUploadResponse({ message: `<strong>${result.message}</strong>`, learnedFiles: result.learned_files, isError: false });
+                }
+            } catch (error) {
+                displayUploadResponse({ message: `Network error: ${error.message}`, isError: true });
+            }
+        });
+
+        function displayUploadResponse({ message, learnedFiles, isError }) {
+            const colorClass = isError ? 'bg-red-900/50 border-red-700' : 'bg-slate-800/50 border-slate-700';
+            let content = `<div class="p-4 rounded-lg border ${colorClass} fade-in font-mono"><p class="font-semibold">${message}</p>`;
+            if (learnedFiles && learnedFiles.length > 0) {
+                content += `<p class="text-sm text-cyan-300 mt-3 mb-2 font-semibold">Current Knowledge Base:</p><ul class="list-disc list-inside text-sm text-gray-400 bg-black/30 p-3 rounded-md">`;
+                learnedFiles.forEach(file => { content += `<li>${escapeHtml(file)}</li>`; });
+                content += `</ul>`;
+            }
+            content += `</div>`;
+            uploadResponseArea.innerHTML = content;
+        }
+
+        // --- Handlers for the second form (Question Answering) ---
+        const questionForm = document.getElementById('questionForm');
+        const answerResponseArea = document.getElementById('answerResponseArea');
+        const imageInput = document.getElementById('image-upload');
+        const textInput = document.getElementById('text-question');
+
+        questionForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const questionText = textInput.value.trim();
+            const questionFile = imageInput.files[0];
+
+            if (!questionText && !questionFile) {
+                displayAnswerResponse({ message: "Please type a question or upload a file.", isError: true });
+                return;
+            }
+
+            const formData = new FormData();
+            if (questionText) {
+                formData.append('question_text', questionText);
+            }
+            if (questionFile) {
+                formData.append('question_file', questionFile);
+            }
+            
+            displayAnswerResponse({ message: "Searching for an answer in your documents...", isError: false });
+
+            try {
+                const response = await fetch('/get-answer/', { method: 'POST', body: formData });
+                const result = await response.json();
+                if (!response.ok) {
+                    displayAnswerResponse({ message: `Error: ${result.detail || 'Something went wrong.'}`, isError: true });
+                } else {
+                    displayAnswerResponse(result);
+                }
+            } catch (error) {
+                const errorMessage = `Network error: ${error.message}. Check the server console for details.`;
+                displayAnswerResponse({ message: errorMessage, isError: true });
+            }
+        });
+        
+        async function searchWeb(question) {
+            displayAnswerResponse({ message: "Searching the web for an answer...", isError: false });
+
+            const formData = new FormData();
+            formData.append('query', question);
+
+            try {
+                const response = await fetch('/web-search/', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+                
+                if (!response.ok) {
+                    displayAnswerResponse({ message: `Error: ${result.detail || 'Something went wrong.'}`, isError: true });
+                } else {
+                    displayAnswerResponse({ question: question, answer: result.answer, source: "Web Search" });
+                }
+            } catch (error) {
+                const errorMessage = `Network error: ${error.message}. Check the server console for details.`;
+                displayAnswerResponse({ message: errorMessage, isError: true });
+            }
+        }
+
+        function displayAnswerResponse(result) {
+            const { message, question, answer, source, ask_web_search, isError } = result;
+            const colorClass = isError ? 'bg-red-900/50 border-red-700' : 'bg-slate-800/50 border-slate-700';
+            let content = `<div class="p-4 rounded-lg border ${colorClass} fade-in font-mono">`;
+            
+            if (message) {
+                content += `<p class="font-semibold">${message}</p>`;
+            }
+            if (question) {
+                content += `<p class="text-sm text-cyan-300 mt-3 mb-2 font-semibold">Question:</p>
+                            <p class="text-sm text-gray-400 bg-black/30 p-3 rounded-md">${escapeHtml(question)}</p>`;
+            }
+            if (answer) {
+                content += `<p class="text-sm text-cyan-300 mt-3 mb-2 font-semibold">Answer (from ${escapeHtml(source)}):</p>
+                            <p class="text-sm text-gray-400 bg-black/30 p-3 rounded-md whitespace-pre-wrap">${escapeHtml(answer)}</p>`;
+            }
+            if (ask_web_search) {
+                content += `<p class="text-sm text-gray-300 mt-4">Would you like me to search for the answer on the internet?</p>
+                            <button onclick="searchWeb('${escapeHtml(question)}')" class="mt-2 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg">Yes, search the web</button>`;
+            }
+
+            content += `</div>`;
+            answerResponseArea.innerHTML = content;
+        }
+
+        function escapeHtml(unsafe) {
+            return unsafe ? unsafe.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;") : "";
+        }
+    </script>
+</body>
+</html>
