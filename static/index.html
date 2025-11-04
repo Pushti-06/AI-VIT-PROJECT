@@ -3,336 +3,716 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VIT AI Command Core</title>
-    
-    <script src="https://cdn.tailwindcss.com"></script>
-    
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
-
+    <title>🎓 VIT Study Assistant - AI Learning Platform</title>
     <style>
-        /* --- Core Styles & Background --- */
-        body {
-            font-family: 'Roboto Mono', monospace;
-            background-color: #020418;
-            background-image: 
-                radial-gradient(white, rgba(255,255,255,0) 2px, transparent 40px),
-                radial-gradient(white, rgba(255,255,255,0) 1px, transparent 30px),
-                radial-gradient(white, rgba(255,255,255,0) 2px, transparent 40px),
-                radial-gradient(rgba(255,255,255,.4), rgba(255,255,255,0) 2px, transparent 30px);
-            background-size: 550px 550px, 350px 350px, 250px 250px, 150px 150px; 
-            background-position: 0 0, 40px 60px, 130px 270px, 70px 100px;
-            animation: stars-move 300s linear infinite;
-        }
-
-        @keyframes stars-move {
-            from { background-position: 0 0, 40px 60px, 130px 270px, 70px 100px; }
-            to { background-position: -10000px 5000px, -10040px 5060px, -10130px 5270px, -10070px 5100px; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body { 
+            font-family: 'Inter', 'Segoe UI', sans-serif; 
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #e0e0e0;
+            min-height: 100vh;
         }
         
-        /* --- 3D Perspective Container --- */
-        .perspective-container {
-            perspective: 1500px;
-        }
-
-        .main-panel {
-            font-family: 'Orbitron', sans-serif;
-            background: rgba(10, 25, 47, 0.8);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(0, 191, 255, 0.4);
-            box-shadow: 0 0 30px rgba(0, 191, 255, 0.2);
-            transform: rotateX(5deg) rotateY(-3deg);
-            transition: transform 0.5s ease;
-        }
-        .main-panel:hover {
-            transform: rotateX(0deg) rotateY(0deg);
-        }
-
-        /* --- Custom UI Elements --- */
-        .header-text {
-            text-shadow: 0 0 8px rgba(0, 191, 255, 0.7);
-        }
-
-        .custom-input {
-            background-color: rgba(0, 10, 20, 0.7);
-            border: 1px solid rgba(0, 191, 255, 0.3);
-            transition: all 0.3s ease;
-            font-family: 'Roboto Mono', monospace;
-        }
-        .custom-input:focus {
-            border-color: rgba(0, 191, 255, 0.8);
-            box-shadow: 0 0 15px rgba(0, 191, 255, 0.5);
-        }
-
-        .custom-button {
-            background: transparent;
-            border: 2px solid;
-            transition: all 0.3s ease-out;
-            position: relative;
-            overflow: hidden;
-        }
-        .custom-button::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 0;
-            height: 0;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 50%;
-            transform: translate(-50%, -50%);
-            transition: width 0.4s, height 0.4s;
-        }
-        .custom-button:hover::before {
-            width: 250%;
-            height: 250%;
-        }
-        .custom-button:hover {
-            box-shadow: 0 0 20px rgba(255,255,255,0.4);
-        }
-        .btn-green { border-color: #00ff9b; color: #00ff9b; }
-        .btn-green:hover { background-color: #00ff9b; color: #020418; box-shadow: 0 0 20px #00ff9b; }
-        
-        .btn-indigo { border-color: #8257e5; color: #8257e5; }
-        .btn-indigo:hover { background-color: #8257e5; color: #020418; box-shadow: 0 0 20px #8257e5; }
-
-        /* --- Response Area Animations --- */
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .fade-in {
-            animation: fadeIn 0.5s ease-out forwards;
-        }
-
-        /* --- Interactive Robot Placeholder --- */
-        #robot-assistant {
+        .sidebar {
             position: fixed;
-            bottom: 20px;
-            right: 20px;
-            width: 100px;
-            height: 100px;
-            transition: transform 0.3s ease;
-            z-index: 100;
+            left: 0;
+            top: 0;
+            width: 280px;
+            height: 100vh;
+            background: rgba(15, 15, 30, 0.95);
+            border-right: 2px solid #667eea;
+            overflow-y: auto;
+            padding: 20px;
+            z-index: 1000;
         }
-        #robot-assistant:hover {
-            transform: scale(1.1);
-        }
-        #robot-assistant-bubble {
-            position: absolute;
-            bottom: 110px; /* Position above the robot */
-            right: 0;
-            background-color: rgba(0, 191, 255, 0.9);
-            color: #020418;
-            padding: 10px;
-            border-radius: 10px;
-            font-size: 12px;
-            font-family: 'Roboto Mono', monospace;
-            width: 180px;
+        
+        .logo {
             text-align: center;
-            opacity: 0;
-            transform: translateY(10px);
-            transition: opacity 0.3s, transform 0.3s;
-            pointer-events: none; /* Allows clicks to pass through */
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #667eea;
         }
-        #robot-assistant:hover #robot-assistant-bubble {
-            opacity: 1;
-            transform: translateY(0);
+        
+        .logo h1 {
+            font-size: 2em;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+        
+        .logo p {
+            font-size: 0.85em;
+            color: #999;
+        }
+        
+        .category {
+            margin-bottom: 30px;
+        }
+        
+        .category-title {
+            font-size: 0.85em;
+            color: #999;
+            text-transform: uppercase;
+            font-weight: 600;
+            margin-bottom: 12px;
+            letter-spacing: 1px;
+        }
+        
+        .menu-item {
+            padding: 12px 15px;
+            margin-bottom: 8px;
+            background: rgba(102, 126, 234, 0.1);
+            border-left: 3px solid transparent;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.95em;
+            color: #b0b0b0;
+        }
+        
+        .menu-item:hover {
+            background: rgba(102, 126, 234, 0.2);
+            border-left-color: #667eea;
+            color: #667eea;
+        }
+        
+        .menu-item.active {
+            background: rgba(102, 126, 234, 0.3);
+            border-left-color: #667eea;
+            color: #667eea;
+            font-weight: 600;
+        }
+        
+        .main {
+            margin-left: 280px;
+            padding: 40px;
+            min-height: 100vh;
+        }
+        
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid rgba(102, 126, 234, 0.3);
+        }
+        
+        .title {
+            font-size: 2.5em;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(102, 126, 234, 0.15);
+            padding: 12px 20px;
+            border-radius: 8px;
+            border: 2px solid #667eea;
+        }
+        
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: #28a745;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .stat {
+            background: rgba(45, 45, 80, 0.6);
+            border: 2px solid rgba(102, 126, 234, 0.3);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 1.8em;
+            font-weight: 700;
+            color: #667eea;
+        }
+        
+        .stat-label {
+            font-size: 0.85em;
+            color: #999;
+            margin-top: 5px;
+        }
+        
+        .content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 25px;
+        }
+        
+        .card {
+            background: rgba(45, 45, 80, 0.6);
+            border: 2px solid rgba(102, 126, 234, 0.3);
+            border-radius: 12px;
+            padding: 25px;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s;
+            display: none;
+        }
+        
+        .card.active {
+            display: block;
+        }
+        
+        .card:hover {
+            border-color: #667eea;
+            box-shadow: 0 0 30px rgba(102, 126, 234, 0.2);
+        }
+        
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid rgba(102, 126, 234, 0.2);
+        }
+        
+        .card-icon {
+            font-size: 2.5em;
+        }
+        
+        .card-title {
+            font-size: 1.3em;
+            font-weight: 600;
+            color: #e0e0e0;
+        }
+        
+        .card-desc {
+            font-size: 0.85em;
+            color: #999;
+            margin-top: 3px;
+        }
+        
+        .input-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            font-size: 0.9em;
+            color: #999;
+            margin-bottom: 8px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        input, textarea, select {
+            width: 100%;
+            padding: 12px 15px;
+            background: rgba(30, 30, 50, 0.8);
+            border: 2px solid rgba(102, 126, 234, 0.3);
+            border-radius: 8px;
+            color: #e0e0e0;
+            font-size: 0.95em;
+            font-family: inherit;
+            transition: all 0.3s;
+            margin-bottom: 10px;
+        }
+        
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 15px rgba(102, 126, 234, 0.3);
+        }
+        
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+        
+        input[type="file"]::file-selector-button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        
+        button {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+        
+        button:disabled {
+            background: #555;
+            transform: none;
+        }
+        
+        .result {
+            margin-top: 20px;
+            padding: 20px;
+            background: rgba(30, 30, 50, 0.9);
+            border-left: 4px solid #667eea;
+            border-radius: 8px;
+            display: none;
+        }
+        
+        .result.show {
+            display: block;
+        }
+        
+        .result.success {
+            border-left-color: #28a745;
+        }
+        
+        .result.error {
+            border-left-color: #dc3545;
+        }
+        
+        .result-title {
+            font-weight: 600;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+        
+        .result-content {
+            font-size: 0.95em;
+            color: #d0d0d0;
+            line-height: 1.6;
+            word-break: break-word;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            margin-top: 15px;
+        }
+        
+        .spinner {
+            border: 3px solid rgba(102, 126, 234, 0.2);
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 10px auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .loading.show {
+            display: block;
+        }
+        
+        img {
+            max-width: 100%;
+            border-radius: 8px;
+            margin-top: 15px;
+            border: 2px solid rgba(102, 126, 234, 0.3);
+        }
+        
+        audio {
+            width: 100%;
+            margin-top: 15px;
+        }
+        
+        .two-col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        
+        .two-col input {
+            margin-bottom: 0;
+        }
+
+        .result-content pre {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 5px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar { width: 200px; }
+            .main { margin-left: 200px; padding: 20px; }
+            .content { grid-template-columns: 1fr; }
+            .stats { grid-template-columns: repeat(2, 1fr); }
         }
     </style>
 </head>
-<body class="bg-gray-900 text-gray-100 font-sans">
-
-    <div id="robot-assistant">
-        <div id="robot-assistant-bubble">Hello! I'm here to help you navigate the Command Core.</div>
-        <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <circle cx="50" cy="50" r="45" fill="rgba(10, 25, 47, 0.8)" stroke="#00bfff" stroke-width="2"/>
-            <circle cx="38" cy="45" r="8" fill="#00bfff"/>
-            <circle cx="62" cy="45" r="8" fill="#00bfff"/>
-            <path d="M35 65 C 40 75, 60 75, 65 65" stroke="#00bfff" stroke-width="2"/>
-            <path d="M49 50 L 49 55" stroke="#00bfff" stroke-width="2" />
-            <path d="M51 50 L 51 55" stroke="#00bfff" stroke-width="2" />
-        </svg>
-    </div>
-
-    <div class="container mx-auto p-4 md:p-8 perspective-container">
-        <div class="main-panel p-8 rounded-2xl w-full max-w-3xl mx-auto">
-            
-            <h1 class="text-3xl font-bold text-center mb-8 text-cyan-300 header-text tracking-widest">
-                V.I.T. A.I. COMMAND CORE
-            </h1>
-            
-            <div class="mb-8 border-b border-cyan-500/30 pb-8">
-                <p class="text-center text-cyan-400 mb-6 text-sm uppercase tracking-wider">[ Module 1: Knowledge Ingestion ]</p>
-                <form id="uploadForm" class="space-y-6">
-                    <div>
-                        <label for="file-upload" class="block text-sm font-medium text-gray-300 mb-2">Select Datastream (PDF/DOCX):</label>
-                        <input id="file-upload" name="file" type="file" accept=".pdf,.docx" class="block w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-cyan-500/20 file:text-cyan-300 hover:file:bg-cyan-500/40 transition-colors cursor-pointer" required>
-                    </div>
-                    <button type="submit" class="w-full font-bold py-3 px-4 rounded-lg custom-button btn-green">
-                        UPLOAD & INTEGRATE
-                    </button>
-                </form>
-                <div id="uploadResponseArea" class="mt-6"></div>
-            </div>
-
-            <div>
-                <p class="text-center text-cyan-400 mb-6 text-sm uppercase tracking-wider">[ Module 2: Execute Query ]</p>
-                <form id="questionForm" class="space-y-6">
-                    <div>
-                        <label for="text-question" class="block text-sm font-medium text-gray-300 mb-2">Query Input:</label>
-                        <input id="text-question" type="text" placeholder="e.g., What is CPU scheduling?" class="w-full rounded-lg p-3 text-sm focus:outline-none custom-input text-cyan-300 placeholder:text-cyan-700">
-                    </div>
-                     <div>
-                        <label for="image-upload" class="block text-sm font-medium text-gray-300 mb-2">Or Upload Query File:</label>
-                        <input id="image-upload" name="image" type="file" accept=".pdf,.docx,image/png,image/jpeg" class="block w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-indigo-500/20 file:text-indigo-300 hover:file:bg-indigo-500/40 transition-colors cursor-pointer">
-                    </div>
-                    <button type="submit" class="w-full font-bold py-3 px-4 rounded-lg custom-button btn-indigo">
-                        PROCESS QUERY
-                    </button>
-                </form>
-                <div id="answerResponseArea" class="mt-6"></div>
-            </div>
-
+<body>
+    <div class="sidebar">
+        <div class="logo">
+            <h1>📚 VIT</h1>
+            <p>Study Assistant v2.0</p>
+        </div>
+        
+        <div class="category">
+            <div class="category-title">📝 Text Analysis</div>
+            <div class="menu-item active" onclick="openTab(0, this)">✍️ Generation</div>
+            <div class="menu-item" onclick="openTab(1, this)">🏷️ Classification</div>
+            <div class="menu-item" onclick="openTab(2, this)">🏷️ NER</div>
+            <div class="menu-item" onclick="openTab(3, this)">❓ Q&A (Context)</div>
+            <div class="menu-item" onclick="openTab(4, this)">🎯 Zero-Shot</div>
+        </div>
+        
+        <div class="category">
+            <div class="category-title">🎯 Language & Utility</div>
+            <div class="menu-item" onclick="openTab(5, this)">📝 Summarization</div>
+            <div class="menu-item" onclick="openTab(6, this)">🌍 Translation (EN→FR)</div>
+            <div class="menu-item" onclick="openTab(7, this)">🔗 Similarity</div>
+            <div class="menu-item" onclick="openTab(8, this)">🎭 Fill Mask</div>
+        </div>
+        
+        <div class="category">
+            <div class="category-title">🖼️ Vision</div>
+            <div class="menu-item" onclick="openTab(9, this)">🖼️ Image Class</div>
+            <div class="menu-item" onclick="openTab(10, this)">🎯 Detection</div>
+            <div class="menu-item" onclick="openTab(11, this)">🔀 Segmentation</div>
+            <div class="menu-item" onclick="openTab(12, this)">📝→🖼️ Generate</div>
+            <div class="menu-item" onclick="openTab(17, this)">📊 Table Q&A</div> </div>
+        
+        <div class="category">
+            <div class="category-title">🎤 Audio</div>
+            <div class="menu-item" onclick="openTab(13, this)">🎤→📝 Transcribe</div>
+            <div class="menu-item" onclick="openTab(14, this)">📝→🔊 Speak</div>
+        </div>
+        
+        <div class="category">
+            <div class="category-title">📂 Knowledge (RAG)</div>
+            <div class="menu-item" onclick="openTab(15, this)">📂 Upload</div>
+            <div class="menu-item" onclick="openTab(16, this)">💡 Doc Q&A</div>
         </div>
     </div>
 
+    <div class="main">
+        <div class="top-bar">
+            <h2 class="title">🤖 AI Study Assistant</h2>
+            <div class="status" id="status">
+                <div class="status-dot"></div>
+                <span id="statusText">Loading...</span>
+            </div>
+        </div>
+
+        <div class="stats">
+            <div class="stat">
+                <div class="stat-value" id="docCount">0</div>
+                <div class="stat-label">Documents (Chunks)</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value" id="featureCount">0</div>
+                <div class="stat-label">Features</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value" id="modelCountDisplay">0</div>
+                <div class="stat-label">Models</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value" id="statusSymbol">🔴</div>
+                <div class="stat-label">Backend Status</div>
+            </div>
+        </div>
+
+        <div class="content" id="content"></div>
+    </div>
+
     <script>
-        // --- Handlers for the first form (File Upload) ---
-        const uploadForm = document.getElementById('uploadForm');
-        const uploadResponseArea = document.getElementById('uploadResponseArea');
-        const fileInput = document.getElementById('file-upload');
+        const BASE_URL = 'http://127.0.0.1:8000';
+        let currentTab = 0;
 
-        uploadForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const file = fileInput.files[0];
-            if (!file) {
-                displayUploadResponse({ message: "Please select a file first.", isError: true });
-                return;
-            }
-            const formData = new FormData();
-            formData.append('uploaded_file', file);
-            displayUploadResponse({ message: "Uploading and learning...", isError: false });
+        // NOTE: Tasks array with correct endpoint names and structure
+        const tasks = [
+            { id: 'chat', title: 'General Text Generation', desc: 'Chat with the general AI model', icon: '✍️', endpoint: '/chat' },
+            { id: 'text-class', title: 'Text Classification', desc: 'Classify text based on predefined labels', icon: '🏷️', endpoint: '/classify-text' },
+            { id: 'ner', title: 'Named Entity Recognition', desc: 'Extract entities (people, places, organizations)', icon: '🏷️', endpoint: '/ner' },
+            { id: 'qa-context', title: 'Contextual Question Answering', desc: 'Get an answer from provided context', icon: '❓', endpoint: '/contextual-qa' },
+            { id: 'zero-shot', title: 'Zero-Shot Classification', desc: 'Classify without model training', icon: '🎯', endpoint: '/zero-shot-classification' },
+            { id: 'summarization', title: 'Summarization', desc: 'Summarize long texts', icon: '📝', endpoint: '/summarize' },
+            { id: 'translation', title: 'Translation (EN→FR)', desc: 'Translate text from English to French', icon: '🌍', endpoint: '/translate-en-fr' },
+            { id: 'similarity', title: 'Sentence Similarity', desc: 'Extract embeddings to check similarity', icon: '🔗', endpoint: '/sentence-similarity' },
+            { id: 'fill-mask', title: 'Fill Mask', desc: 'Predict masked words in a sentence', icon: '🎭', endpoint: '/fill-mask' },
+            { id: 'img-class', title: 'Image Classification', desc: 'Classify objects in an uploaded image', icon: '🖼️', endpoint: '/classify-image' },
+            { id: 'detection', title: 'Object Detection', desc: 'Detect and locate objects in an image', icon: '🎯', endpoint: '/detect-objects' },
+            { id: 'segmentation', title: 'Image Segmentation', desc: 'Segment regions in the image', icon: '🔀', endpoint: '/segment-image' },
+            { id: 'txt-img', title: 'Text to Image Generation', desc: 'Generate images from a text prompt', icon: '📝→🖼️', endpoint: '/generate-image' },
+            { id: 'asr', title: 'Automatic Speech Recognition', desc: 'Transcribe spoken audio to text', icon: '🎤→📝', endpoint: '/recognize-speech' },
+            { id: 'tts', title: 'Text to Speech', desc: 'Convert text to a downloadable audio file', icon: '📝→🔊', endpoint: '/text-to-speech' },
+            { id: 'upload', title: 'Upload Documents', desc: 'Add files (PDF, DOCX, Image) to the RAG knowledge base', icon: '📂', endpoint: '/upload-file' },
+            { id: 'doc-qa', title: 'Document Q&A (RAG)', desc: 'Ask questions based on uploaded documents', icon: '💡', endpoint: '/document-qa' },
+            { id: 'table-qa', title: 'Table Question Answering', desc: 'Ask questions about data in a JSON table', icon: '📊', endpoint: '/table-qa' }
+        ];
 
-            try {
-                const response = await fetch('/upload-file/', { method: 'POST', body: formData });
-                const result = await response.json();
-                if (!response.ok) {
-                    displayUploadResponse({ message: `Error: ${result.detail || 'Something went wrong.'}`, isError: true });
-                } else {
-                    displayUploadResponse({ message: `<strong>${result.message}</strong>`, learnedFiles: result.learned_files, isError: false });
-                }
-            } catch (error) {
-                displayUploadResponse({ message: `Network error: ${error.message}`, isError: true });
+        function getContentHTML(idx) {
+            // This function dynamically generates the input form HTML for a given task index
+            if (idx === 0) { // Chat
+                return `<div class="input-group"><label>Question</label><textarea id="inp-${idx}" name="question_text" placeholder="Ask anything..."></textarea></div><button onclick="call(${idx})">Chat</button>`;
+            } else if ([1, 4].includes(idx)) { // Text/Zero-Shot Classification
+                return `<div class="input-group"><label>Text</label><textarea id="inp-${idx}" name="text" placeholder="Enter text..."></textarea></div>
+                        <div class="input-group"><label>Candidate Labels (comma separated)</label><input type="text" id="inp2-${idx}" name="labels" placeholder="positive, negative, neutral"></div><button onclick="call(${idx})">Classify</button>`;
+            } else if (idx === 2) { // NER
+                return `<div class="input-group"><label>Text</label><textarea id="inp-${idx}" name="text" placeholder="John Smith is from NYC..."></textarea></div><button onclick="call(${idx})">Extract Entities</button>`;
+            } else if (idx === 3) { // Contextual QA
+                return `<div class="input-group"><label>Context</label><textarea id="inp-${idx}" name="context" placeholder="Enter context..."></textarea></div>
+                        <div class="input-group"><label>Question</label><input type="text" id="inp2-${idx}" name="question" placeholder="Ask..."></div><button onclick="call(${idx})">Answer</button>`;
+            } else if (idx === 5) { // Summarization
+                return `<div class="input-group"><label>Text to Summarize</label><textarea id="inp-${idx}" name="text" placeholder="Long text..." style="min-height: 150px;"></textarea></div><button onclick="call(${idx})">Summarize</button>`;
+            } else if (idx === 6) { // Translation (EN->FR)
+                return `<div class="input-group"><label>English Text</label><textarea id="inp-${idx}" name="text" placeholder="English..."></textarea></div><button onclick="call(${idx})">Translate to French</button>`;
+            } else if (idx === 7) { // Sentence Similarity (Feature Extraction)
+                return `<div class="input-group"><label>Source Sentence</label><input type="text" id="inp-${idx}" name="source_sentence" placeholder="First sentence..."></div>
+                        <div class="input-group"><label>Comparison Sentences (newline separated)</label><textarea id="inp2-${idx}" name="compare_sentences" placeholder="Sentence 2\nSentence 3"></textarea></div><button onclick="call(${idx})">Compare</button>`;
+            } else if (idx === 8) { // Fill Mask
+                return `<div class="input-group"><label>Text with [MASK]</label><input type="text" id="inp-${idx}" name="text" placeholder="The sky is [MASK]"></div><button onclick="call(${idx})">Fill</button>`;
+            } else if ([9, 10, 11].includes(idx)) { // Image Tasks
+                return `<div class="input-group"><label>Image File</label><input type="file" id="inp-${idx}" name="image" accept="image/*"></div><button onclick="call(${idx})">Process Image</button>`;
+            } else if (idx === 12) { // Text to Image
+                return `<div class="input-group"><label>Description</label><textarea id="inp-${idx}" name="prompt" placeholder="A futuristic city in neon light..."></textarea></div><button onclick="call(${idx})">Generate Image</button>`;
+            } else if (idx === 13) { // ASR
+                return `<div class="input-group"><label>Audio File (WAV, MP3)</label><input type="file" id="inp-${idx}" name="audio_file" accept="audio/*"></div><button onclick="call(${idx})">Transcribe</button>`;
+            } else if (idx === 14) { // TTS
+                return `<div class="input-group"><label>Text to Speak</label><textarea id="inp-${idx}" name="text" placeholder="Say something..."></textarea></div><button onclick="call(${idx})">Speak</button>`;
+            } else if (idx === 15) { // Document Upload
+                return `<div class="input-group"><label>File (PDF, DOCX, Image)</label><input type="file" id="inp-${idx}" name="uploaded_file" accept=".pdf,.docx,image/*"></div>
+                        <button onclick="call(${idx})">Upload & Learn</button>
+                        <button onclick="clearDatabase()" style="margin-top: 10px; background: #dc3545; border-color: #dc3545;">Clear Knowledge Base</button>`;
+            } else if (idx === 16) { // Document Q&A
+                return `<div class="input-group"><label>Question for Uploaded Documents</label><input type="text" id="inp-${idx}" name="question_text" placeholder="Ask from documents..."></div><button onclick="call(${idx})">Ask Document Q&A</button>`;
+            } else if (idx === 17) { // Table QA
+                return `<div class="input-group"><label>Question</label><input type="text" id="inp-${idx}" name="question" placeholder="e.g., What is the price of the laptop?"></div>
+                        <div class="input-group"><label>Table Data (JSON string)</label><textarea id="inp2-${idx}" name="table_json" placeholder='{"Product": ["Laptop", "Monitor"], "Price": ["1200", "300"]}'>Table Data (JSON string)</textarea></div>
+                        <button onclick="call(${idx})">Answer from Table</button>`;
             }
-        });
-
-        function displayUploadResponse({ message, learnedFiles, isError }) {
-            const colorClass = isError ? 'bg-red-900/50 border-red-700' : 'bg-slate-800/50 border-slate-700';
-            let content = `<div class="p-4 rounded-lg border ${colorClass} fade-in font-mono"><p class="font-semibold">${message}</p>`;
-            if (learnedFiles && learnedFiles.length > 0) {
-                content += `<p class="text-sm text-cyan-300 mt-3 mb-2 font-semibold">Current Knowledge Base:</p><ul class="list-disc list-inside text-sm text-gray-400 bg-black/30 p-3 rounded-md">`;
-                learnedFiles.forEach(file => { content += `<li>${escapeHtml(file)}</li>`; });
-                content += `</ul>`;
-            }
-            content += `</div>`;
-            uploadResponseArea.innerHTML = content;
         }
 
-        // --- Handlers for the second form (Question Answering) ---
-        const questionForm = document.getElementById('questionForm');
-        const answerResponseArea = document.getElementById('answerResponseArea');
-        const imageInput = document.getElementById('image-upload');
-        const textInput = document.getElementById('text-question');
 
-        questionForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const questionText = textInput.value.trim();
-            const questionFile = imageInput.files[0];
+        function createCard(idx) {
+            const t = tasks[idx];
+            const contentHTML = getContentHTML(idx); // Get the form content HTML
 
-            if (!questionText && !questionFile) {
-                displayAnswerResponse({ message: "Please type a question or upload a file.", isError: true });
-                return;
-            }
+            // Generate the entire card HTML as a single string
+            let html = `
+                <div class="card" id="card-${idx}">
+                    <div class="card-header">
+                        <div class="card-icon">${t.icon}</div>
+                        <div>
+                            <div class="card-title">${t.title}</div>
+                            <div class="card-desc">${t.desc}</div>
+                        </div>
+                    </div>
+                    <div id="content-${idx}">
+                        ${contentHTML}
+                    </div>
+                    <div class="loading" id="load-${idx}"><div class="spinner"></div></div>
+                    <div class="result" id="result-${idx}"></div>
+                </div>
+            `;
+            return html;
+        }
 
-            const formData = new FormData();
-            if (questionText) {
-                formData.append('question_text', questionText);
+
+        function renderContent() {
+            let html = '';
+            for (let i = 0; i < tasks.length; i++) {
+                html += createCard(i);
             }
-            if (questionFile) {
-                formData.append('question_file', questionFile);
+            document.getElementById('content').innerHTML = html;
+            // Activate the default tab (Generation)
+            openTab(0, document.querySelector('.menu-item.active'));
+        }
+
+        function openTab(idx, el) {
+            document.querySelectorAll('.card').forEach(c => c.classList.remove('active'));
+            document.querySelectorAll('.menu-item').forEach(m => m.classList.remove('active'));
+            const card = document.getElementById(`card-${idx}`);
+            if (card) {
+                card.classList.add('active');
             }
-            
-            displayAnswerResponse({ message: "Searching for an answer in your documents...", isError: false });
+            if (el) {
+                el.classList.add('active');
+            }
+            currentTab = idx;
+        }
+
+        async function call(idx) {
+            const task = tasks[idx];
+            const inp = document.getElementById(`inp-${idx}`);
+            const inp2 = document.getElementById(`inp2-${idx}`);
+            const loading = document.getElementById(`load-${idx}`);
+            const result = document.getElementById(`result-${idx}`);
+
+            loading.classList.add('show');
+            result.classList.remove('show', 'success', 'error');
 
             try {
-                const response = await fetch('/get-answer/', { method: 'POST', body: formData });
-                const result = await response.json();
-                if (!response.ok) {
-                    displayAnswerResponse({ message: `Error: ${result.detail || 'Something went wrong.'}`, isError: true });
-                } else {
-                    displayAnswerResponse(result);
-                }
-            } catch (error) {
-                const errorMessage = `Network error: ${error.message}. Check the server console for details.`;
-                displayAnswerResponse({ message: errorMessage, isError: true });
-            }
-        });
-        
-        async function searchWeb(question) {
-            displayAnswerResponse({ message: "Searching the web for an answer...", isError: false });
-
-            const formData = new FormData();
-            formData.append('query', question);
-
-            try {
-                const response = await fetch('/web-search/', {
-                    method: 'POST',
-                    body: formData
-                });
-
-                const result = await response.json();
+                const fd = new FormData();
                 
-                if (!response.ok) {
-                    displayAnswerResponse({ message: `Error: ${result.detail || 'Something went wrong.'}`, isError: true });
-                } else {
-                    displayAnswerResponse({ question: question, answer: result.answer, source: "Web Search" });
+                // --- Form Data Mapping (using element IDs to get values) ---
+                if (task.id === 'chat') {
+                    fd.append('question_text', inp.value);
+                } else if (task.id === 'text-class' || task.id === 'zero-shot') {
+                    fd.append('text', inp.value);
+                    fd.append('labels', inp2.value);
+                } else if (task.id === 'ner' || task.id === 'summarization' || task.id === 'translation' || task.id === 'fill-mask' || task.id === 'tts') {
+                    fd.append('text', inp.value);
+                } else if (task.id === 'qa-context') {
+                    fd.append('context', inp.value);
+                    fd.append('question', inp2.value);
+                } else if (task.id === 'similarity') {
+                    fd.append('source_sentence', inp.value);
+                    fd.append('compare_sentences', inp2.value);
+                } else if (task.id === 'txt-img') {
+                    fd.append('prompt', inp.value);
+                } else if (task.id === 'doc-qa') {
+                    fd.append('question_text', inp.value);
+                } else if (task.id === 'table-qa') {
+                    fd.append('question', inp.value);
+                    fd.append('table_json', inp2.value);
+                } else if (['img-class', 'detection', 'segmentation'].includes(task.id)) {
+                    if (inp.files.length === 0) throw new Error("Please select an image file.");
+                    fd.append('image', inp.files[0]);
+                } else if (task.id === 'asr') {
+                    if (inp.files.length === 0) throw new Error("Please select an audio file.");
+                    fd.append('audio_file', inp.files[0]);
+                } else if (task.id === 'upload') {
+                    if (inp.files.length === 0) throw new Error("Please select a file to upload.");
+                    fd.append('uploaded_file', inp.files[0]);
                 }
-            } catch (error) {
-                const errorMessage = `Network error: ${error.message}. Check the server console for details.`;
-                displayAnswerResponse({ message: errorMessage, isError: true });
+                
+                // Fetch
+                const res = await fetch(BASE_URL + task.endpoint, { method: 'POST', body: fd });
+                const data = await res.json();
+
+                if (!res.ok) {
+                    throw new Error(data.detail || `HTTP Error: ${res.status}`);
+                }
+
+                // --- Result Display ---
+                let html = '<div class="result-title">✅ Result</div><div class="result-content">';
+
+                if (data.image_url) {
+                    html += `<p>Prompt: ${data.prompt}</p><img src="${data.image_url}" alt="Generated Image">`;
+                } else if (data.audio_url) {
+                    html += `<p>Text: ${data.text || '...'}</p><audio controls src="${data.audio_url}"></audio>`;
+                } else if (data.transcription) {
+                    html += `<p><strong>Transcription:</strong> ${data.transcription}</p>`;
+                } else if (data.summary) {
+                    html += `<p><strong>Summary:</strong> ${data.summary}</p>`;
+                } else if (data.translation) {
+                    html += `<p><strong>Original (EN):</strong> ${data.original}</p><p><strong>Translation (FR):</strong> ${data.translation}</p>`;
+                } else if (data.answer) {
+                    html += `<p><strong>Answer:</strong> ${data.answer}</p><p class="card-desc" style="margin-top:10px;">Source: ${data.source || 'N/A'}</p>`;
+                } else if (data.message && data.chunks_added !== undefined) {
+                    html += `<p><strong>Upload Success:</strong> ${data.message}</p><p>Learned files: ${data.learned_files.join(', ')}</p>`;
+                    updateHealth(); // Refresh document count
+                } else if (data.message) {
+                    html += `<p><strong>Message:</strong> ${data.message}</p>`;
+                } else {
+                    // Display structured JSON results (NER, Classification, Detection, Segmentation)
+                    html += `<pre>${JSON.stringify(data, null, 2)}</pre>`;
+                }
+
+                html += '</div>';
+                result.innerHTML = html;
+                result.classList.add('show', 'success');
+
+            } catch (e) {
+                loading.classList.remove('show');
+                console.error("API Call Error:", e);
+                result.innerHTML = `<div class="result-title">❌ Error</div><div class="result-content">${e.message || "An unexpected error occurred."}</div>`;
+                result.classList.add('show', 'error');
+            } finally {
+                loading.classList.remove('show');
             }
         }
 
-        function displayAnswerResponse(result) {
-            const { message, question, answer, source, ask_web_search, isError } = result;
-            const colorClass = isError ? 'bg-red-900/50 border-red-700' : 'bg-slate-800/50 border-slate-700';
-            let content = `<div class="p-4 rounded-lg border ${colorClass} fade-in font-mono">`;
-            
-            if (message) {
-                content += `<p class="font-semibold">${message}</p>`;
-            }
-            if (question) {
-                content += `<p class="text-sm text-cyan-300 mt-3 mb-2 font-semibold">Question:</p>
-                            <p class="text-sm text-gray-400 bg-black/30 p-3 rounded-md">${escapeHtml(question)}</p>`;
-            }
-            if (answer) {
-                content += `<p class="text-sm text-cyan-300 mt-3 mb-2 font-semibold">Answer (from ${escapeHtml(source)}):</p>
-                            <p class="text-sm text-gray-400 bg-black/30 p-3 rounded-md whitespace-pre-wrap">${escapeHtml(answer)}</p>`;
-            }
-            if (ask_web_search) {
-                content += `<p class="text-sm text-gray-300 mt-4">Would you like me to search for the answer on the internet?</p>
-                            <button onclick="searchWeb('${escapeHtml(question)}')" class="mt-2 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg">Yes, search the web</button>`;
-            }
+        async function clearDatabase() {
+            if (!confirm("Are you sure you want to clear the RAG knowledge base? This action cannot be undone.")) return;
 
-            content += `</div>`;
-            answerResponseArea.innerHTML = content;
+            const loading = document.getElementById(`load-${15}`); // Use upload card's loader
+            const result = document.getElementById(`result-${15}`);
+            loading.classList.add('show');
+            result.classList.remove('show', 'success', 'error');
+
+            try {
+                const res = await fetch(BASE_URL + '/clear-database', { method: 'DELETE' });
+                const data = await res.json();
+
+                if (!res.ok) {
+                    throw new Error(data.detail || `HTTP Error: ${res.status}`);
+                }
+
+                result.innerHTML = `<div class="result-title">✅ Success</div><div class="result-content">${data.message}</div>`;
+                result.classList.add('show', 'success');
+                updateHealth();
+            } catch (e) {
+                result.innerHTML = `<div class="result-title">❌ Error</div><div class="result-content">Failed to clear DB: ${e.message}</div>`;
+                result.classList.add('show', 'error');
+            } finally {
+                loading.classList.remove('show');
+            }
         }
 
-        function escapeHtml(unsafe) {
-            return unsafe ? unsafe.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;") : "";
+        async function updateHealth() {
+            try {
+                const res = await fetch(BASE_URL + '/health');
+                const data = await res.json();
+
+                document.getElementById('docCount').textContent = data.documents_loaded;
+                document.getElementById('featureCount').textContent = data.features.length;
+                document.getElementById('modelCountDisplay').textContent = Object.keys(data.models).length;
+
+                const isHealthy = data.status === 'healthy' && data.token_status.includes('configured');
+                
+                document.getElementById('statusText').textContent = isHealthy ? 'Backend Ready' : 'Warning/Error';
+                document.getElementById('statusSymbol').textContent = isHealthy ? '🟢' : '🟡';
+                document.querySelector('.status-dot').style.backgroundColor = isHealthy ? '#28a745' : '#ffc107';
+
+            } catch (e) {
+                document.getElementById('statusText').textContent = 'Backend Offline';
+                document.getElementById('statusSymbol').textContent = '🔴';
+                document.querySelector('.status-dot').style.backgroundColor = '#dc3545';
+            }
         }
+
+        // --- Initialization ---
+        renderContent();
+        updateHealth();
+        setInterval(updateHealth, 5000);
     </script>
 </body>
 </html>
