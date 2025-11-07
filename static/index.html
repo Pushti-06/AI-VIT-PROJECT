@@ -347,16 +347,6 @@
             margin-top: 15px;
         }
         
-        .two-col {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-        }
-        
-        .two-col input {
-            margin-bottom: 0;
-        }
-
         .result-content pre {
             white-space: pre-wrap;
             word-wrap: break-word;
@@ -365,6 +355,14 @@
             border-radius: 5px;
             max-height: 300px;
             overflow-y: auto;
+        }
+
+        .prediction-item {
+            background: rgba(102, 126, 234, 0.1);
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 5px;
+            border-left: 3px solid #667eea;
         }
         
         @media (max-width: 768px) {
@@ -383,46 +381,34 @@
         </div>
         
         <div class="category">
-            <div class="category-title">📝 Text Analysis</div>
-            <div class="menu-item active" onclick="openTab(0, this)">✍️ Generation</div>
-            <div class="menu-item" onclick="openTab(1, this)">🏷️ Classification</div>
-            <div class="menu-item" onclick="openTab(2, this)">🏷️ NER</div>
-            <div class="menu-item" onclick="openTab(3, this)">❓ Q&A (Context)</div>
-            <div class="menu-item" onclick="openTab(4, this)">🎯 Zero-Shot</div>
+            <div class="category-title">💬 Core</div>
+            <div class="menu-item active" onclick="openTab(0, this)">💬 Chat</div>
+            <div class="menu-item" onclick="openTab(1, this)">💡 Doc Q&A</div>
+            <div class="menu-item" onclick="openTab(2, this)">📂 Upload Files</div>
         </div>
         
         <div class="category">
-            <div class="category-title">🎯 Language & Utility</div>
-            <div class="menu-item" onclick="openTab(5, this)">📝 Summarization</div>
-            <div class="menu-item" onclick="openTab(6, this)">🌍 Translation (EN→FR)</div>
-            <div class="menu-item" onclick="openTab(7, this)">🔗 Similarity</div>
-            <div class="menu-item" onclick="openTab(8, this)">🎭 Fill Mask</div>
+            <div class="category-title">📝 Text Tasks</div>
+            <div class="menu-item" onclick="openTab(3, this)">🏷️ Classification</div>
+            <div class="menu-item" onclick="openTab(4, this)">👤 NER</div>
+            <div class="menu-item" onclick="openTab(5, this)">📄 Summarize</div>
+            <div class="menu-item" onclick="openTab(6, this)">🌍 Translate</div>
         </div>
         
         <div class="category">
-            <div class="category-title">🖼️ Vision</div>
-            <div class="menu-item" onclick="openTab(9, this)">🖼️ Image Class</div>
-            <div class="menu-item" onclick="openTab(10, this)">🎯 Detection</div>
-            <div class="menu-item" onclick="openTab(11, this)">🔀 Segmentation</div>
-            <div class="menu-item" onclick="openTab(12, this)">📝→🖼️ Generate</div>
-            <div class="menu-item" onclick="openTab(17, this)">📊 Table Q&A</div> </div>
-        
-        <div class="category">
-            <div class="category-title">🎤 Audio</div>
-            <div class="menu-item" onclick="openTab(13, this)">🎤→📝 Transcribe</div>
-            <div class="menu-item" onclick="openTab(14, this)">📝→🔊 Speak</div>
+            <div class="category-title">🖼️ Vision Tasks</div>
+            <div class="menu-item" onclick="openTab(7, this)">🎨 Generate Image</div>
         </div>
         
         <div class="category">
-            <div class="category-title">📂 Knowledge (RAG)</div>
-            <div class="menu-item" onclick="openTab(15, this)">📂 Upload</div>
-            <div class="menu-item" onclick="openTab(16, this)">💡 Doc Q&A</div>
+            <div class="category-title">🔊 Audio Tasks</div>
+            <div class="menu-item" onclick="openTab(8, this)">🔊 Text-to-Speech</div>
         </div>
     </div>
 
     <div class="main">
         <div class="top-bar">
-            <h2 class="title">🤖 AI Study Assistant</h2>
+            <h2 class="title">AI Study Assistant</h2>
             <div class="status" id="status">
                 <div class="status-dot"></div>
                 <span id="statusText">Loading...</span>
@@ -455,77 +441,39 @@
         const BASE_URL = 'http://127.0.0.1:8000';
         let currentTab = 0;
 
-        // NOTE: Tasks array with correct endpoint names and structure
         const tasks = [
-            { id: 'chat', title: 'General Text Generation', desc: 'Chat with the general AI model', icon: '✍️', endpoint: '/chat' },
-            { id: 'text-class', title: 'Text Classification', desc: 'Classify text based on predefined labels', icon: '🏷️', endpoint: '/classify-text' },
-            { id: 'ner', title: 'Named Entity Recognition', desc: 'Extract entities (people, places, organizations)', icon: '🏷️', endpoint: '/ner' },
-            { id: 'qa-context', title: 'Contextual Question Answering', desc: 'Get an answer from provided context', icon: '❓', endpoint: '/contextual-qa' },
-            { id: 'zero-shot', title: 'Zero-Shot Classification', desc: 'Classify without model training', icon: '🎯', endpoint: '/zero-shot-classification' },
-            { id: 'summarization', title: 'Summarization', desc: 'Summarize long texts', icon: '📝', endpoint: '/summarize' },
-            { id: 'translation', title: 'Translation (EN→FR)', desc: 'Translate text from English to French', icon: '🌍', endpoint: '/translate-en-fr' },
-            { id: 'similarity', title: 'Sentence Similarity', desc: 'Extract embeddings to check similarity', icon: '🔗', endpoint: '/sentence-similarity' },
-            { id: 'fill-mask', title: 'Fill Mask', desc: 'Predict masked words in a sentence', icon: '🎭', endpoint: '/fill-mask' },
-            { id: 'img-class', title: 'Image Classification', desc: 'Classify objects in an uploaded image', icon: '🖼️', endpoint: '/classify-image' },
-            { id: 'detection', title: 'Object Detection', desc: 'Detect and locate objects in an image', icon: '🎯', endpoint: '/detect-objects' },
-            { id: 'segmentation', title: 'Image Segmentation', desc: 'Segment regions in the image', icon: '🔀', endpoint: '/segment-image' },
-            { id: 'txt-img', title: 'Text to Image Generation', desc: 'Generate images from a text prompt', icon: '📝→🖼️', endpoint: '/generate-image' },
-            { id: 'asr', title: 'Automatic Speech Recognition', desc: 'Transcribe spoken audio to text', icon: '🎤→📝', endpoint: '/recognize-speech' },
-            { id: 'tts', title: 'Text to Speech', desc: 'Convert text to a downloadable audio file', icon: '📝→🔊', endpoint: '/text-to-speech' },
-            { id: 'upload', title: 'Upload Documents', desc: 'Add files (PDF, DOCX, Image) to the RAG knowledge base', icon: '📂', endpoint: '/upload-file' },
-            { id: 'doc-qa', title: 'Document Q&A (RAG)', desc: 'Ask questions based on uploaded documents', icon: '💡', endpoint: '/document-qa' },
-            { id: 'table-qa', title: 'Table Question Answering', desc: 'Ask questions about data in a JSON table', icon: '📊', endpoint: '/table-qa' }
+            { id: 'chat', title: 'General Chat', desc: 'Chat with the AI assistant', icon: '💬', endpoint: '/chat' },
+            { id: 'doc-qa', title: 'Document Q&A', desc: 'Ask questions from your documents', icon: '💡', endpoint: '/document-qa' },
+            { id: 'upload', title: 'Upload Documents', desc: 'Add files to knowledge base', icon: '📂', endpoint: '/upload-file' },
+            { id: 'text-class', title: 'Text Classification', desc: 'Classify text into categories', icon: '🏷️', endpoint: '/classify-text' },
+            { id: 'ner', title: 'Named Entity Recognition', desc: 'Extract people, places, organizations', icon: '👤', endpoint: '/ner' },
+            { id: 'summarization', title: 'Text Summarization', desc: 'Summarize long texts', icon: '📄', endpoint: '/summarize' },
+            { id: 'translation', title: 'Translation', desc: 'Translate text to any language', icon: '🌍', endpoint: '/translate' },
+            { id: 'txt-img', title: 'Generate Image', desc: 'Create images from text', icon: '🎨', endpoint: '/generate-image' },
+            { id: 'tts', title: 'Text to Speech', desc: 'Convert text to audio', icon: '🔊', endpoint: '/text-to-speech' }
         ];
 
         function getContentHTML(idx) {
-            // This function dynamically generates the input form HTML for a given task index
-            if (idx === 0) { // Chat
-                return `<div class="input-group"><label>Question</label><textarea id="inp-${idx}" name="question_text" placeholder="Ask anything..."></textarea></div><button onclick="call(${idx})">Chat</button>`;
-            } else if ([1, 4].includes(idx)) { // Text/Zero-Shot Classification
-                return `<div class="input-group"><label>Text</label><textarea id="inp-${idx}" name="text" placeholder="Enter text..."></textarea></div>
-                        <div class="input-group"><label>Candidate Labels (comma separated)</label><input type="text" id="inp2-${idx}" name="labels" placeholder="positive, negative, neutral"></div><button onclick="call(${idx})">Classify</button>`;
-            } else if (idx === 2) { // NER
-                return `<div class="input-group"><label>Text</label><textarea id="inp-${idx}" name="text" placeholder="John Smith is from NYC..."></textarea></div><button onclick="call(${idx})">Extract Entities</button>`;
-            } else if (idx === 3) { // Contextual QA
-                return `<div class="input-group"><label>Context</label><textarea id="inp-${idx}" name="context" placeholder="Enter context..."></textarea></div>
-                        <div class="input-group"><label>Question</label><input type="text" id="inp2-${idx}" name="question" placeholder="Ask..."></div><button onclick="call(${idx})">Answer</button>`;
-            } else if (idx === 5) { // Summarization
-                return `<div class="input-group"><label>Text to Summarize</label><textarea id="inp-${idx}" name="text" placeholder="Long text..." style="min-height: 150px;"></textarea></div><button onclick="call(${idx})">Summarize</button>`;
-            } else if (idx === 6) { // Translation (EN->FR)
-                return `<div class="input-group"><label>English Text</label><textarea id="inp-${idx}" name="text" placeholder="English..."></textarea></div><button onclick="call(${idx})">Translate to French</button>`;
-            } else if (idx === 7) { // Sentence Similarity (Feature Extraction)
-                return `<div class="input-group"><label>Source Sentence</label><input type="text" id="inp-${idx}" name="source_sentence" placeholder="First sentence..."></div>
-                        <div class="input-group"><label>Comparison Sentences (newline separated)</label><textarea id="inp2-${idx}" name="compare_sentences" placeholder="Sentence 2\nSentence 3"></textarea></div><button onclick="call(${idx})">Compare</button>`;
-            } else if (idx === 8) { // Fill Mask
-                return `<div class="input-group"><label>Text with [MASK]</label><input type="text" id="inp-${idx}" name="text" placeholder="The sky is [MASK]"></div><button onclick="call(${idx})">Fill</button>`;
-            } else if ([9, 10, 11].includes(idx)) { // Image Tasks
-                return `<div class="input-group"><label>Image File</label><input type="file" id="inp-${idx}" name="image" accept="image/*"></div><button onclick="call(${idx})">Process Image</button>`;
-            } else if (idx === 12) { // Text to Image
-                return `<div class="input-group"><label>Description</label><textarea id="inp-${idx}" name="prompt" placeholder="A futuristic city in neon light..."></textarea></div><button onclick="call(${idx})">Generate Image</button>`;
-            } else if (idx === 13) { // ASR
-                return `<div class="input-group"><label>Audio File (WAV, MP3)</label><input type="file" id="inp-${idx}" name="audio_file" accept="audio/*"></div><button onclick="call(${idx})">Transcribe</button>`;
-            } else if (idx === 14) { // TTS
-                return `<div class="input-group"><label>Text to Speak</label><textarea id="inp-${idx}" name="text" placeholder="Say something..."></textarea></div><button onclick="call(${idx})">Speak</button>`;
-            } else if (idx === 15) { // Document Upload
-                return `<div class="input-group"><label>File (PDF, DOCX, Image)</label><input type="file" id="inp-${idx}" name="uploaded_file" accept=".pdf,.docx,image/*"></div>
-                        <button onclick="call(${idx})">Upload & Learn</button>
-                        <button onclick="clearDatabase()" style="margin-top: 10px; background: #dc3545; border-color: #dc3545;">Clear Knowledge Base</button>`;
-            } else if (idx === 16) { // Document Q&A
-                return `<div class="input-group"><label>Question for Uploaded Documents</label><input type="text" id="inp-${idx}" name="question_text" placeholder="Ask from documents..."></div><button onclick="call(${idx})">Ask Document Q&A</button>`;
-            } else if (idx === 17) { // Table QA
-                return `<div class="input-group"><label>Question</label><input type="text" id="inp-${idx}" name="question" placeholder="e.g., What is the price of the laptop?"></div>
-                        <div class="input-group"><label>Table Data (JSON string)</label><textarea id="inp2-${idx}" name="table_json" placeholder='{"Product": ["Laptop", "Monitor"], "Price": ["1200", "300"]}'>Table Data (JSON string)</textarea></div>
-                        <button onclick="call(${idx})">Answer from Table</button>`;
-            }
+            const forms = {
+                0: `<div class="input-group"><label>Your Question</label><textarea id="inp-${idx}" placeholder="Ask me anything..."></textarea></div>`,
+                1: `<div class="input-group"><label>Question</label><input type="text" id="inp-${idx}" placeholder="Ask from uploaded documents..."></div>`,
+                2: `<div class="input-group"><label>Upload File (PDF, DOCX, Image)</label><input type="file" id="inp-${idx}" accept=".pdf,.docx,image/*"></div>
+                     <button onclick="clearDatabase()" style="margin-top: 10px; background: #dc3545;">🗑️ Clear Knowledge Base</button>`,
+                3: `<div class="input-group"><label>Text to Classify</label><textarea id="inp-${idx}" placeholder="Enter text..."></textarea></div>
+                    <div class="input-group"><label>Labels (comma-separated)</label><input type="text" id="inp2-${idx}" placeholder="positive, negative, neutral"></div>`,
+                4: `<div class="input-group"><label>Text for NER</label><textarea id="inp-${idx}" placeholder="John Smith works at Apple in New York..."></textarea></div>`,
+                5: `<div class="input-group"><label>Text to Summarize</label><textarea id="inp-${idx}" placeholder="Long text..." style="min-height: 150px;"></textarea></div>`,
+                6: `<div class="input-group"><label>Text (English)</label><textarea id="inp-${idx}" placeholder="Hello, how are you?"></textarea></div>
+                    <div class="input-group"><label>Target Language</label><input type="text" id="inp2-${idx}" placeholder="es (Spanish), fr (French), de (German), hi (Hindi)"></div>`,
+                7: `<div class="input-group"><label>Image Description</label><textarea id="inp-${idx}" placeholder="A futuristic city at sunset..."></textarea></div>`,
+                8: `<div class="input-group"><label>Text to Speak</label><textarea id="inp-${idx}" placeholder="Enter text to convert to speech..."></textarea></div>`
+            };
+            return forms[idx] + `<button onclick="call(${idx})">▶️ Execute</button>`;
         }
-
 
         function createCard(idx) {
             const t = tasks[idx];
-            const contentHTML = getContentHTML(idx); // Get the form content HTML
-
-            // Generate the entire card HTML as a single string
-            let html = `
+            return `
                 <div class="card" id="card-${idx}">
                     <div class="card-header">
                         <div class="card-icon">${t.icon}</div>
@@ -534,37 +482,23 @@
                             <div class="card-desc">${t.desc}</div>
                         </div>
                     </div>
-                    <div id="content-${idx}">
-                        ${contentHTML}
-                    </div>
+                    <div id="content-${idx}">${getContentHTML(idx)}</div>
                     <div class="loading" id="load-${idx}"><div class="spinner"></div></div>
                     <div class="result" id="result-${idx}"></div>
                 </div>
             `;
-            return html;
         }
 
-
         function renderContent() {
-            let html = '';
-            for (let i = 0; i < tasks.length; i++) {
-                html += createCard(i);
-            }
-            document.getElementById('content').innerHTML = html;
-            // Activate the default tab (Generation)
+            document.getElementById('content').innerHTML = tasks.map((_, i) => createCard(i)).join('');
             openTab(0, document.querySelector('.menu-item.active'));
         }
 
         function openTab(idx, el) {
             document.querySelectorAll('.card').forEach(c => c.classList.remove('active'));
             document.querySelectorAll('.menu-item').forEach(m => m.classList.remove('active'));
-            const card = document.getElementById(`card-${idx}`);
-            if (card) {
-                card.classList.add('active');
-            }
-            if (el) {
-                el.classList.add('active');
-            }
+            document.getElementById(`card-${idx}`)?.classList.add('active');
+            el?.classList.add('active');
             currentTab = idx;
         }
 
@@ -581,68 +515,62 @@
             try {
                 const fd = new FormData();
                 
-                // --- Form Data Mapping (using element IDs to get values) ---
-                if (task.id === 'chat') {
-                    fd.append('question_text', inp.value);
-                } else if (task.id === 'text-class' || task.id === 'zero-shot') {
-                    fd.append('text', inp.value);
-                    fd.append('labels', inp2.value);
-                } else if (task.id === 'ner' || task.id === 'summarization' || task.id === 'translation' || task.id === 'fill-mask' || task.id === 'tts') {
-                    fd.append('text', inp.value);
-                } else if (task.id === 'qa-context') {
-                    fd.append('context', inp.value);
-                    fd.append('question', inp2.value);
-                } else if (task.id === 'similarity') {
-                    fd.append('source_sentence', inp.value);
-                    fd.append('compare_sentences', inp2.value);
-                } else if (task.id === 'txt-img') {
-                    fd.append('prompt', inp.value);
-                } else if (task.id === 'doc-qa') {
-                    fd.append('question_text', inp.value);
-                } else if (task.id === 'table-qa') {
-                    fd.append('question', inp.value);
-                    fd.append('table_json', inp2.value);
-                } else if (['img-class', 'detection', 'segmentation'].includes(task.id)) {
-                    if (inp.files.length === 0) throw new Error("Please select an image file.");
-                    fd.append('image', inp.files[0]);
-                } else if (task.id === 'asr') {
-                    if (inp.files.length === 0) throw new Error("Please select an audio file.");
-                    fd.append('audio_file', inp.files[0]);
-                } else if (task.id === 'upload') {
-                    if (inp.files.length === 0) throw new Error("Please select a file to upload.");
-                    fd.append('uploaded_file', inp.files[0]);
-                }
+                // Form data mapping
+                const formMappings = {
+                    0: () => fd.append('question_text', inp.value),
+                    1: () => fd.append('question_text', inp.value),
+                    2: () => { if (!inp.files[0]) throw new Error("Select file"); fd.append('uploaded_file', inp.files[0]); },
+                    3: () => { fd.append('text', inp.value); fd.append('labels', inp2.value); },
+                    4: () => fd.append('text', inp.value),
+                    5: () => fd.append('text', inp.value),
+                    6: () => { fd.append('text', inp.value); fd.append('source_lang', 'en'); fd.append('target_lang', inp2.value || 'es'); },
+                    7: () => fd.append('prompt', inp.value),
+                    8: () => fd.append('text', inp.value)
+                };
+
+                formMappings[idx]?.();
                 
-                // Fetch
                 const res = await fetch(BASE_URL + task.endpoint, { method: 'POST', body: fd });
                 const data = await res.json();
 
-                if (!res.ok) {
-                    throw new Error(data.detail || `HTTP Error: ${res.status}`);
-                }
+                if (!res.ok) throw new Error(data.detail || `Error ${res.status}`);
 
-                // --- Result Display ---
+                // Display results
                 let html = '<div class="result-title">✅ Result</div><div class="result-content">';
 
                 if (data.image_url) {
-                    html += `<p>Prompt: ${data.prompt}</p><img src="${data.image_url}" alt="Generated Image">`;
+                    html += `<p><strong>Prompt:</strong> ${data.prompt}</p><img src="${BASE_URL}${data.image_url}">`;
                 } else if (data.audio_url) {
-                    html += `<p>Text: ${data.text || '...'}</p><audio controls src="${data.audio_url}"></audio>`;
-                } else if (data.transcription) {
-                    html += `<p><strong>Transcription:</strong> ${data.transcription}</p>`;
+                    html += `<p><strong>Text:</strong> ${data.text || '...'}</p><audio controls src="${BASE_URL}${data.audio_url}"></audio>`;
                 } else if (data.summary) {
                     html += `<p><strong>Summary:</strong> ${data.summary}</p>`;
                 } else if (data.translation) {
-                    html += `<p><strong>Original (EN):</strong> ${data.original}</p><p><strong>Translation (FR):</strong> ${data.translation}</p>`;
-                } else if (data.answer) {
-                    html += `<p><strong>Answer:</strong> ${data.answer}</p><p class="card-desc" style="margin-top:10px;">Source: ${data.source || 'N/A'}</p>`;
+                    html += `<p><strong>Original (${data.source_language || 'EN'}):</strong> ${data.original}</p>
+                             <p><strong>Translation (${data.target_language || 'Target'}):</strong> ${data.translation}</p>`;
+                } else if (data.answer !== undefined) {
+                    html += `<p><strong>Answer:</strong> ${data.answer}</p>${data.source ? `<p class="card-desc" style="margin-top:10px;">Source: ${data.source}</p>` : ''}`;
+                } else if (data.entities && Array.isArray(data.entities)) {
+                    html += '<p><strong>Entities:</strong></p>';
+                    data.entities.forEach(e => {
+                        html += `<div class="prediction-item"><strong>${e.entity_group || e.entity}</strong>: ${e.word} (${(e.score * 100).toFixed(1)}%)</div>`;
+                    });
+                } else if (data.classification) {
+                    html += '<p><strong>Classification:</strong></p>';
+                    if (data.classification.labels && data.classification.scores) {
+                        data.classification.labels.forEach((label, i) => {
+                            html += `<div class="prediction-item"><strong>${label}</strong>: ${(data.classification.scores[i] * 100).toFixed(2)}%</div>`;
+                        });
+                    } else {
+                        html += `<pre>${JSON.stringify(data.classification, null, 2)}</pre>`;
+                    }
                 } else if (data.message && data.chunks_added !== undefined) {
-                    html += `<p><strong>Upload Success:</strong> ${data.message}</p><p>Learned files: ${data.learned_files.join(', ')}</p>`;
-                    updateHealth(); // Refresh document count
+                    html += `<p><strong>✅ Upload Success!</strong></p>
+                             <p>${data.message}</p>
+                             <p><strong>Files in Knowledge Base:</strong> ${data.learned_files.join(', ')}</p>`;
+                    updateHealth();
                 } else if (data.message) {
                     html += `<p><strong>Message:</strong> ${data.message}</p>`;
                 } else {
-                    // Display structured JSON results (NER, Classification, Detection, Segmentation)
                     html += `<pre>${JSON.stringify(data, null, 2)}</pre>`;
                 }
 
@@ -651,9 +579,8 @@
                 result.classList.add('show', 'success');
 
             } catch (e) {
-                loading.classList.remove('show');
-                console.error("API Call Error:", e);
-                result.innerHTML = `<div class="result-title">❌ Error</div><div class="result-content">${e.message || "An unexpected error occurred."}</div>`;
+                console.error("API Error:", e);
+                result.innerHTML = `<div class="result-title">❌ Error</div><div class="result-content">${e.message || "Unexpected error occurred"}</div>`;
                 result.classList.add('show', 'error');
             } finally {
                 loading.classList.remove('show');
@@ -661,10 +588,10 @@
         }
 
         async function clearDatabase() {
-            if (!confirm("Are you sure you want to clear the RAG knowledge base? This action cannot be undone.")) return;
+            if (!confirm("⚠️ Clear all documents from knowledge base? This cannot be undone!")) return;
 
-            const loading = document.getElementById(`load-${15}`); // Use upload card's loader
-            const result = document.getElementById(`result-${15}`);
+            const loading = document.getElementById(`load-2`);
+            const result = document.getElementById(`result-2`);
             loading.classList.add('show');
             result.classList.remove('show', 'success', 'error');
 
@@ -672,15 +599,13 @@
                 const res = await fetch(BASE_URL + '/clear-database', { method: 'DELETE' });
                 const data = await res.json();
 
-                if (!res.ok) {
-                    throw new Error(data.detail || `HTTP Error: ${res.status}`);
-                }
+                if (!res.ok) throw new Error(data.detail || `Error ${res.status}`);
 
                 result.innerHTML = `<div class="result-title">✅ Success</div><div class="result-content">${data.message}</div>`;
                 result.classList.add('show', 'success');
                 updateHealth();
             } catch (e) {
-                result.innerHTML = `<div class="result-title">❌ Error</div><div class="result-content">Failed to clear DB: ${e.message}</div>`;
+                result.innerHTML = `<div class="result-title">❌ Error</div><div class="result-content">Failed: ${e.message}</div>`;
                 result.classList.add('show', 'error');
             } finally {
                 loading.classList.remove('show');
@@ -693,26 +618,38 @@
                 const data = await res.json();
 
                 document.getElementById('docCount').textContent = data.documents_loaded;
-                document.getElementById('featureCount').textContent = data.features.length;
-                document.getElementById('modelCountDisplay').textContent = Object.keys(data.models).length;
-
-                const isHealthy = data.status === 'healthy' && data.token_status.includes('configured');
                 
-                document.getElementById('statusText').textContent = isHealthy ? 'Backend Ready' : 'Warning/Error';
+                // Count total features from all categories
+                let totalFeatures = 0;
+                if (data.features && typeof data.features === 'object') {
+                    Object.values(data.features).forEach(arr => {
+                        if (Array.isArray(arr)) totalFeatures += arr.length;
+                    });
+                } else if (Array.isArray(data.features)) {
+                    totalFeatures = data.features.length;
+                }
+                document.getElementById('featureCount').textContent = totalFeatures;
+                
+                document.getElementById('modelCountDisplay').textContent = Object.keys(data.models || {}).length;
+
+                const isHealthy = data.status === 'healthy' && data.token_status && data.token_status.includes('configured');
+                
+                document.getElementById('statusText').textContent = isHealthy ? '✅ Backend Ready' : '⚠️ Warning';
                 document.getElementById('statusSymbol').textContent = isHealthy ? '🟢' : '🟡';
                 document.querySelector('.status-dot').style.backgroundColor = isHealthy ? '#28a745' : '#ffc107';
 
             } catch (e) {
-                document.getElementById('statusText').textContent = 'Backend Offline';
+                console.error("Health check failed:", e);
+                document.getElementById('statusText').textContent = '❌ Backend Offline';
                 document.getElementById('statusSymbol').textContent = '🔴';
                 document.querySelector('.status-dot').style.backgroundColor = '#dc3545';
             }
         }
 
-        // --- Initialization ---
+        // Initialize
         renderContent();
         updateHealth();
-        setInterval(updateHealth, 5000);
+        setInterval(updateHealth, 10000);
     </script>
 </body>
 </html>
